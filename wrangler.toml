@@ -1,0 +1,9 @@
+name = "image-bg-remover"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NODE_ENV = "production"
+
+# Secrets (set via wrangler secret put or Cloudflare Dashboard)
+# REMOVE_BG_API_KEY = "CMzuCXd1A8GPjzPJGecpQ95r"

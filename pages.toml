@@ -1,0 +1,9 @@
+# This file is used to configure the Cloudflare Pages build
+# The actual build command is in package.json scripts
+
+[build]
+command = "npm run pages:build"
+
+[build.upload]
+format = "directory"
+dir = ".vercel/output/static"
