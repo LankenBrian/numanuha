@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import Providers from './providers'
-import './globals.css'
 
 export const metadata: Metadata = {
   title: 'BG Remover Pro - AI Background Removal Tool',
@@ -11,7 +9,15 @@ export const metadata: Metadata = {
     title: 'BG Remover Pro - AI Background Removal Tool',
     description: 'Remove image backgrounds instantly with AI. Perfect for e-commerce, social media, and product photography.',
     type: 'website',
-    images: ['/og-image.jpg'],
+    url: 'https://bgremover.pro',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'BG Remover Pro',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -22,26 +28,15 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
-}
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#1e1b4b" />
-      </head>
-      <body className="min-h-screen">
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
-  )
+  verification: {
+    google: 'your-google-verification-code',
+  },
 }

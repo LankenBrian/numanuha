@@ -1,23 +1,21 @@
 {
   "version": 2,
-  "name": "image-bg-remover",
   "builds": [
     {
       "src": "package.json",
       "use": "@vercel/next"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "env": {
-    "REMOVE_BG_API_KEY": "@remove_bg_api_key"
+    "NEXTAUTH_URL": "@nextauth_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "DATABASE_URL": "@database_url",
+    "REMOVE_BG_API_KEY": "@remove_bg_api_key",
+    "STRIPE_SECRET_KEY": "@stripe_secret_key",
+    "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret",
+    "STRIPE_PRICE_ID_PRO": "@stripe_price_id_pro",
+    "RESEND_API_KEY": "@resend_api_key",
+    "FROM_EMAIL": "@from_email",
+    "FAL_API_KEY": "@fal_api_key"
   }
 }

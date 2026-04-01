@@ -1,86 +1,166 @@
-# Quick Deploy Guide
+# Deployment Guide for BG Remover Pro
 
-## Prerequisites
-- Node.js 18+
-- Cloudflare account
-- Remove.bg API key
+## 1. Database Setup (Neon)
 
-## Step 1: Install Dependencies
+### Create Database
+1. Go to https://neon.tech
+2. Sign up / Log in
+3. Create new project
+4. Copy the connection string
+5. Add to Vercel environment variables as `DATABASE_URL`
+
+### Run Migrations
 ```bash
-cd image-bg-remover
-npm install
+# Local development
+npx prisma migrate dev
+
+# Production (after connecting to Neon)
+npx prisma migrate deploy
 ```
 
-## Step 2: Set Environment Variables
-```bash
-# Copy example file
-cp .env.example .env.local
+## 2. Vercel Deployment
 
-# Edit .env.local and add your API key
-REMOVE_BG_API_KEY=your_api_key_here
+### Install Vercel CLI
+```bash
+npm i -g vercel
 ```
 
-## Step 3: Local Development
+### Login & Deploy
 ```bash
-npm run dev
-```
-Visit http://localhost:3000
-
-## Step 4: Deploy to Cloudflare
-
-### Install Wrangler (if not already installed)
-```bash
-npm install -g wrangler
+vercel login
+vercel --prod
 ```
 
-### Login to Cloudflare
+### Environment Variables (Vercel Dashboard)
+
+Required:
+- `NEXTAUTH_URL` - Your production URL (e.g., https://bgremover.pro)
+- `NEXTAUTH_SECRET` - Generate with `openssl rand -base64 32`
+- `DATABASE_URL` - Neon PostgreSQL connection string
+- `REMOVE_BG_API_KEY` - From https://www.remove.bg/api
+- `STRIPE_SECRET_KEY` - From Stripe Dashboard
+- `STRIPE_WEBHOOK_SECRET` - From Stripe webhook configuration
+- `STRIPE_PRICE_ID_PRO` - Create in Stripe Dashboard
+- `RESEND_API_KEY` - From https://resend.com
+- `FROM_EMAIL` - Your sender email (e.g., noreply@yourdomain.com)
+
+Optional:
+- `FAL_API_KEY` - For AI background generation
+- `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO` - Same as STRIPE_PRICE_ID_PRO
+
+## 3. Stripe Configuration
+
+### Create Products & Prices
+1. Go to Stripe Dashboard → Products
+2. Create product "BG Remover Pro"
+3. Create recurring price: $9.99/month
+4. Copy Price ID to environment variables
+
+### Configure Webhook
+1. Go to Stripe Dashboard → Developers → Webhooks
+2. Add endpoint: `https://yourdomain.com/api/stripe/webhook`
+3. Select events:
+   - `checkout.session.completed`
+   - `invoice.payment_succeeded`
+   - `customer.subscription.deleted`
+4. Copy webhook secret to environment variables
+
+## 4. Domain Setup
+
+### Custom Domain (Vercel)
+1. Go to Vercel Dashboard → Project Settings → Domains
+2. Add your domain
+3. Follow DNS configuration instructions
+
+### Email Domain (Resend)
+1. Go to Resend Dashboard
+2. Add and verify your domain
+3. Configure SPF, DKIM, DMARC records
+
+## 5. Post-Deployment Checklist
+
+### Test Core Features
+- [ ] User registration
+- [ ] Email verification
+- [ ] Login/logout
+- [ ] Background removal (free tier)
+- [ ] Upgrade to Pro (Stripe checkout)
+- [ ] Webhook processing
+- [ ] Email notifications
+
+### Test Growth Features
+- [ ] Referral system
+- [ ] Referral code tracking
+- [ ] Affiliate application
+- [ ] Affiliate link tracking
+
+### Test Email Flows
+- [ ] Welcome email
+- [ ] Verification email
+- [ ] Low credits reminder
+
+## 6. Monitoring & Analytics
+
+### Add Google Analytics
+1. Create GA4 property
+2. Add tracking ID to `_app.tsx` or layout
+
+### Add Sentry (Error Tracking)
 ```bash
-wrangler login
+npm install @sentry/nextjs
 ```
 
-### Set Secrets
+### Vercel Analytics
+Enable in Vercel Dashboard → Analytics
+
+## 7. Backup & Maintenance
+
+### Database Backups
+Neon provides automatic backups. For manual backup:
 ```bash
-wrangler secret put REMOVE_BG_API_KEY
-# Enter your API key when prompted
+pg_dump $DATABASE_URL > backup.sql
 ```
 
-### Build and Deploy
+### Regular Tasks
+- Monitor Stripe webhooks for failures
+- Check email delivery rates in Resend
+- Review affiliate applications
+- Monitor server logs in Vercel
+
+## Quick Commands
+
 ```bash
-npm run pages:build
-npm run pages:deploy
+# Deploy to production
+vercel --prod
+
+# View logs
+vercel logs --production
+
+# Environment variables
+vercel env ls
+
+# Add secret
+vercel env add DATABASE_URL production
 ```
 
 ## Troubleshooting
 
 ### Build Errors
-If you see errors about Next.js version:
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
+- Check Node.js version (18+)
+- Ensure all env variables are set
+- Run `npm install` locally to verify
 
-### API Key Issues
-Make sure your Remove.bg API key is valid at:
-https://www.remove.bg/dashboard#api-key
+### Database Connection
+- Verify DATABASE_URL format
+- Check if IP is allowlisted (Neon)
+- Test connection: `npx prisma db pull`
 
-### Function Errors
-Check logs with:
-```bash
-wrangler tail
-```
+### Stripe Webhook Failures
+- Check webhook URL is correct
+- Verify webhook secret matches
+- Check Vercel logs for errors
 
-## Next Steps
-
-1. **Add AI Background Generation**
-   - Sign up for Fal.ai or Replicate
-   - Add API key to secrets
-   - Uncomment AI generation code in `functions/api/remove-bg.ts`
-
-2. **Enable Shadow Effects**
-   - Shadow effects are implemented client-side in `src/lib/shadow-effects.ts`
-   - They're automatically applied when downloading images
-
-3. **Customize**
-   - Edit `src/app/page.tsx` to change UI
-   - Edit `tailwind.config.js` to change colors
-   - Add more platform presets in `src/app/page.tsx`
+### Email Not Sending
+- Verify Resend API key
+- Check FROM_EMAIL is verified domain
+- Review Resend dashboard for bounces
