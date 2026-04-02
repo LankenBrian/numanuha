@@ -3,6 +3,9 @@ import { createUser, getUserByEmail } from '@/lib/user'
 import { createVerificationToken, sendVerificationEmail, sendWelcomeEmail } from '@/lib/email'
 import { trackReferralSignup, awardReferralCredits } from '@/lib/referral'
 
+// Edge Runtime 配置
+export const runtime = 'edge'
+
 export async function POST(req: NextRequest) {
   try {
     const { email, password, name, referralCode } = await req.json()

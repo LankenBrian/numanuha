@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyEmailToken } from '@/lib/email'
 
+export const runtime = 'edge'
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -13,11 +15,11 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    const result = await verifyEmailToken(token)
+    const user = await verifyEmailToken(token)
 
-    if (!result.success) {
+    if (!user) {
       return NextResponse.json(
-        { error: result.error },
+        { error: 'Invalid or expired token' },
         { status: 400 }
       )
     }

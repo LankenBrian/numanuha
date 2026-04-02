@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 
 interface UsageStats {
   totalUsage: number
@@ -30,7 +32,8 @@ interface UserData {
   stats: UsageStats
 }
 
-export default function DashboardPage() {
+// 内部组件使用 useSearchParams
+function DashboardContent() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -431,5 +434,16 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// 主页面组件使用 Suspense 包裹
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #831843 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#ffffff', fontSize: '18px' }}>Loading...</div>
+    </div>}>
+      <DashboardContent />
+    </Suspense>
   )
 }

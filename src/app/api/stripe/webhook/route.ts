@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import { trackAffiliateConversion } from '@/lib/affiliate'
+
+// Edge Runtime 配置
+export const runtime = 'edge'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.text()
-    const signature = headers().get('stripe-signature')!
+    const signature = req.headers.get('stripe-signature')!
 
     let event
 
@@ -59,16 +61,16 @@ export async function POST(req: NextRequest) {
 
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object
-        const subscriptionId = invoice.subscription as string
+        const subscriptionId = (invoice as any).subscription as string
         
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-        const userId = subscription.metadata.userId
+        const userId = (subscription as any).metadata?.userId
         
         if (userId) {
           await prisma.user.update({
             where: { id: userId },
             data: {
-              stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              stripeCurrentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
             },
           })
         }

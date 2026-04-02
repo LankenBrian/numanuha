@@ -1,13 +1,35 @@
-name = "image-bg-remover"
-main = "functions/api/remove-bg.js"
+# Cloudflare Pages 部署配置
+# 部署步骤:
+# 1. 安装依赖: npm install
+# 2. 生成 Prisma 客户端: npx prisma generate
+# 3. 构建: npm run pages:build
+# 4. 部署: npx wrangler pages deploy .vercel/output/static
+
+name = "bg-remover-pro"
+
+# 构建配置
+[build]
+command = "npm run pages:build"
+
+# 输出目录
+[site]
+bucket = ".vercel/output/static"
+
+# 兼容性设置
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-[build]
-command = "npm run build"
+# 环境变量 (生产环境)
+[env.production.vars]
+NEXTAUTH_URL = "https://bg-remover-pro.pages.dev"
+NEXTAUTH_SECRET = "your-production-secret-key"
 
-[site]
-bucket = "dist"
-
-[[env.production.vars]]
-REMOVE_BG_API_KEY = "CMzuCXd1A8GPjzPJGecpQ95r"
+# 密钥 (通过 wrangler secret 设置，不要在这里填写真实值)
+# wrangler secret put DATABASE_URL
+# wrangler secret put REMOVE_BG_API_KEY
+# wrangler secret put STRIPE_SECRET_KEY
+# wrangler secret put STRIPE_WEBHOOK_SECRET
+# wrangler secret put STRIPE_PRICE_ID_PRO
+# wrangler secret put RESEND_API_KEY
+# wrangler secret put FROM_EMAIL
+# wrangler secret put FAL_API_KEY

@@ -1,10 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+export const dynamic = 'force-dynamic'
+
+// 内部组件使用 useSearchParams
+function LoginContent() {
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -249,5 +252,16 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// 主页面组件使用 Suspense 包裹
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #831843 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: 'white' }}>Loading...</div>
+    </div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

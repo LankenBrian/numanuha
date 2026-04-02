@@ -1,6 +1,52 @@
 import { Resend } from 'resend'
+import { prisma } from './prisma'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
+
+// Create email verification token
+export async function createVerificationToken(userId: string) {
+  const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+  const verification = await prisma.emailVerification.create({
+    data: {
+      userId,
+      token,
+      expires,
+    },
+  })
+
+  return verification
+}
+
+// Verify email token
+export async function verifyEmailToken(token: string) {
+  const verification = await prisma.emailVerification.findUnique({
+    where: { token },
+    include: { user: true },
+  })
+
+  if (!verification) {
+    return null
+  }
+
+  if (verification.expires < new Date()) {
+    return null
+  }
+
+  // Mark email as verified
+  await prisma.user.update({
+    where: { id: verification.userId },
+    data: { emailVerified: new Date() },
+  })
+
+  // Delete the verification token
+  await prisma.emailVerification.delete({
+    where: { id: verification.id },
+  })
+
+  return verification.user
+}
 
 export async function sendEmail(to: string, subject: string, html: string) {
   if (!process.env.RESEND_API_KEY) {
