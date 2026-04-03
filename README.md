@@ -1,6 +1,8 @@
-# BG Remover Pro - 出海项目开发进度
+# BG Remover Pro - AI Background Removal Tool
 
 ## ✅ Phase 1: 核心功能（已完成）
+
+> Last updated: 2026-04-03 - Cloudflare Pages deployment ready
 
 ### 1. PostgreSQL 数据库集成 ✅
 - 用户表（邮箱、密码、套餐、积分）
