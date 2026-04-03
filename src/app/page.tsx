@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 
 // 内联样式定义
-const styles = {
+const styles: { [key: string]: React.CSSProperties } = {
   container: {
     minHeight: '100vh',
     background: 'linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #831843 100%)',
