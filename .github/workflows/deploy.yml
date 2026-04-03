@@ -20,11 +20,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          npm install
           npx prisma generate
 
       - name: Build with @cloudflare/next-on-pages
-        run: npx @cloudflare/next-on-pages
+        run: npx @cloudflare/next-on-pages@latest
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
